@@ -260,6 +260,53 @@ If the answer is unclear, revert.
 
 ⸻
 
+## 11. VIRTUAL CAMERA OUTPUT (MVP FEATURE)
+
+### Design Constraints for Live Streaming
+
+Virtual camera must maintain AURA's calm principles while being functional.
+
+**Visual Indicators:**
+- Subtle, non-alarming indicator when virtual camera is active
+- Small icon in menu bar or status area — single-color, line-based
+- Shows which app is using the camera (read from system)
+- Clear "Enable/Disable" toggle in main UI
+
+**Toggle Control:**
+- Simple switch or checkbox
+- Label: "Virtual Camera" or "Camera Output"
+- Shows status: "Off" / "Active" / "In Use by [App Name]"
+- No promotional copy, just functional description
+
+**Permission Flow:**
+- Standard macOS camera permission dialog (system-controlled)
+- If permission denied: calm explanation with link to System Preferences
+- No repeated nagging or dark patterns
+
+**Active State:**
+- Minimal indicator (small dot or icon)
+- No pulsing, flashing, or animation
+- No "LIVE" badges or red accents
+- Presence remains unchanged
+
+**Forbidden:**
+- Red "LIVE" indicators
+- Countdown timers
+- Pulsing effects
+- Attention-seeking notifications
+- Recording dots (not recording, just streaming)
+- Any design element that breaks calm
+
+**Visual Consistency:**
+- Virtual camera does NOT change orb appearance
+- Same rendering, same motion, same colors
+- No "streaming mode" visual state
+- Orb behaves identically whether camera is on or off
+
+The same design principles apply: calm > expressive, orb is primary, UI is structural.
+
+⸻
+
 **FINAL STATEMENT**
 
 AURA's design is successful when:
@@ -272,6 +319,8 @@ Design does not speak.
 
 Presence does.
 
+**AURA supports both durable artifacts and live presence.**
+
 ⸻
 
-**Status:** Design constraints locked
+**Status:** Design constraints locked (macOS-only focus)

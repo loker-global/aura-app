@@ -396,12 +396,79 @@ let metadata: [AVMetadataItem] = [
 
 ---
 
+## 12. VIRTUAL CAMERA OUTPUT (MVP FEATURE)
+
+### Live Streaming (Not Export)
+
+AURA provides real-time orb output as a system camera device for use in other applications.
+
+**Key Differences from MP4 Export:**
+- Live streaming (not file-based)
+- Real-time rendering (no offline processing)
+- No encoding to disk (direct frame buffer output)
+- Lower latency (<50ms target)
+
+**Technical Specification:**
+
+```
+Platform: macOS (CoreMediaIO APIs)
+Camera Name: "AURA Orb"
+Resolution: 1080p (1920×1080) preferred, 720p fallback
+Frame Rate: 60 fps (30 fps fallback on older hardware)
+Format: YUV 4:2:0 (kCVPixelFormatType_420YpCbCr8BiPlanarVideoRange)
+Color Space: sRGB
+Latency Target: <50ms (audio input → camera frame output)
+```
+
+**Implementation:**
+- Uses CoreMediaIO Extension APIs (macOS 12.3+)
+- No separate driver installation
+- Integrated into AURA app bundle
+- Activated/deactivated from main UI
+
+**Performance Requirements:**
+- Must maintain frame rate (60fps or 30fps)
+- Cannot drop audio buffers
+- Should monitor system load
+- Graceful degradation if overloaded
+
+**Privacy & Security:**
+- Requires camera permission in Info.plist
+- Clear indicator when camera is in use
+- Shows consuming applications (from system)
+- User can toggle on/off at any time
+- Video only (no audio routing)
+
+**What This Does NOT Affect:**
+- MP4 export quality or settings
+- Audio recording pipeline
+- WAV file creation
+- Playback functionality
+
+**Usage:**
+```
+1. User enables virtual camera in AURA
+2. AURA appears as "AURA Orb" in Zoom/FaceTime/etc.
+3. Other app receives real-time orb video
+4. User disables when done
+```
+
+**Conceptual Framing:**
+- MP4 export: Voice → Presence → Artifact (durable)
+- Virtual camera: Voice → Presence → Live Stream (real-time)
+
+Both use the same orb engine. Virtual camera is real-time version of what gets exported.
+
+---
+
 ## FINAL PRINCIPLE
 
 Exports must feel effortless and trustworthy.
 
 User should never question quality or compatibility.
 
+**AURA supports both durable artifacts and live presence.**
+
 ⸻
 
-**Status:** Export spec locked
+**Status:** Export spec locked (macOS-only focus)

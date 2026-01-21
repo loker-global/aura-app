@@ -1,9 +1,31 @@
 # STATUS
 
 ## Current State
-PRODUCTION READY
+PRODUCTION READY (macOS-only focus)
 
 ## Last Action Taken
+- Created INSTRUCTIONS.md — Comprehensive Xcode project setup guide for macOS
+  - Step-by-step Xcode project creation
+  - Folder structure and file organization
+  - Framework linking and build settings
+  - Info.plist configuration for permissions
+  - Phase-by-phase implementation order
+  - Testing requirements and validation
+  - Debugging tips and performance profiling
+  - Distribution and code signing
+- Updated documentation to include Virtual Camera Output as MVP feature (not optional)
+  - Added "Future Extensions (Non-Blocking)" sections to:
+    - AURA-MANIFEST.md
+    - PRD.md
+    - GOAL.md
+    - ARCHITECTURE.md
+    - EXPORT-SPEC.md
+    - DESIGN.md
+  - Clarified artifact-first philosophy (record → replay → export)
+  - Positioned virtual camera as core MVP feature (Phase 6)
+  - Emphasized: no driver/system extension required for v1
+  - Added trust-first framing and privacy considerations
+  - Updated framing: "AURA supports both durable artifacts and live presence."
 - Completed all 10 gap-filling specifications:
   1. ✓ AUDIO-MAPPING.md (RMS, centroid, ZCR, onset → forces)
   2. ✓ PHYSICS-SPEC.md (mass, damping, spring constants, 60Hz)
@@ -23,7 +45,7 @@ None
 
 ## Next Known Step
 - Hand off to production developer
-- Create Xcode project structure
+- Create Xcode project structure (macOS target)
 - Implement Phase 1: Audio + Physics Foundation
   - AudioCaptureEngine (AVAudioEngine wrapper)
   - WavRecorder (deterministic WAV writer)
@@ -31,16 +53,13 @@ None
   - Unit tests (silence, impulse decay, determinism)
 
 ## Context Notes
-- **100% specification complete** (17 documents total)
+- **100% specification complete** (19 documents total, ~30,000 words)
+- **INSTRUCTIONS.md added** — Complete Xcode setup and implementation guide
+- **macOS-only focus for v1** (iOS deferred)
 - Zero ambiguity at handoff (all implementation details locked)
 - Audio > Rendering > UI priority enforced at every layer
-- Universal binary: iOS 15+ / macOS 12+
+- Platform target: macOS 12+
 - No third-party dependencies
 - Philosophy preserved: tools over hype, precision, voice as memory
+- Virtual camera included as core MVP feature (Phase 6, after export)
 - Developer can execute mechanically from specs
-
-## Context Notes
-- Operator provided complete design documents
-- Target platform: macOS + iOS (universal)
-- Core philosophy: tools over hype, precision, voice as memory
-- Privacy: local-first, no cloud, no accounts

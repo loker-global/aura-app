@@ -386,6 +386,80 @@ Response:
 
 ---
 
+## 14. VIRTUAL CAMERA OUTPUT (MVP FEATURE)
+
+### Module: VirtualCameraOutput
+
+**Location:** Layer 2 (Rendering Core)
+
+**Purpose:** Stream real-time orb rendering as a system camera device for use in other applications.
+
+**Architecture Integration:**
+
+```
+Microphone
+  → AudioCaptureEngine (buffers + metering)
+    → OrbPhysics (force application)
+      → OrbRenderer (visual output)
+        → MTKView (display)
+        → VirtualCameraOutput (system camera)
+```
+
+**Technical Specification:**
+
+```swift
+class VirtualCameraOutput {
+    // CoreMediaIO camera plugin
+    private var cameraExtension: CMIOExtension
+    private var streamSource: CMIOExtensionStreamSource
+    
+    func start()
+    func stop()
+    func sendFrame(_ pixelBuffer: CVPixelBuffer, timestamp: CMTime)
+    func isActive() -> Bool
+}
+```
+
+**Requirements:**
+- Uses CoreMediaIO APIs (macOS 12.3+)
+- No driver or system extension installation
+- Appears as "AURA Orb" in system camera list
+- Same motion contract as exports (no shortcuts)
+- Same 60fps target, same deformation limits
+- Runs on dedicated thread (cannot block audio or UI)
+
+**Data Flow:**
+1. OrbRenderer produces frame (Metal texture)
+2. Texture copied to CVPixelBuffer
+3. VirtualCameraOutput sends frame to CoreMediaIO
+4. System makes frame available to other apps
+
+**Performance:**
+- Must maintain 60fps (or gracefully degrade to 30fps)
+- Cannot impact audio thread performance
+- Should monitor for apps consuming the camera feed
+- Disable if rendering cannot keep up
+
+**Privacy & Permissions:**
+- Requires camera access in Info.plist
+- Clear UI indicator when camera is in use
+- Shows which app is accessing the camera (from system)
+- User can disable at any time
+
+**State Integration:**
+
+Add to AppState enum:
+```swift
+case virtualCameraActive(consumers: [String])
+```
+
+StateManager enforces:
+- Virtual camera can start in idle or recording modes
+- Does not block other operations
+- Clean shutdown on app termination
+
+---
+
 ## FINAL STATEMENT
 
 This architecture enforces:
@@ -396,6 +470,8 @@ This architecture enforces:
 
 If a module violates these rules, the architecture has failed.
 
+**AURA supports both durable artifacts and live presence.**
+
 ⸻
 
-**Status:** Architecture locked
+**Status:** Architecture locked (macOS-only focus)

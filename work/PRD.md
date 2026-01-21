@@ -213,7 +213,7 @@ AURA succeeds if:
 ⸻
 
 ## 13. OUT OF SCOPE (V1)
-- Mobile apps
+- iOS app (macOS-only for v1)
 - Cloud sync
 - Collaboration
 - Advanced audio cleanup
@@ -221,7 +221,46 @@ AURA succeeds if:
 
 ⸻
 
-## 14. RELEASE PHILOSOPHY
+## 14. VIRTUAL CAMERA OUTPUT
+
+### Live Presence Surface (MVP Feature)
+
+AURA includes a virtual camera that streams the orb in real time to other applications.
+
+**What It Does:**
+- Makes the orb available as a system camera device
+- Works with Zoom, FaceTime, OBS, Discord, etc.
+- Same physics, rendering, and motion contract as MP4 exports
+- Same calm, same damping, same deformation limits
+
+**Technical Requirements:**
+- Uses CoreMediaIO APIs on macOS (no driver or system extension installation)
+- Appears as "AURA Orb" in camera selection menus
+- 1080p or 720p output at 60fps (30fps fallback on older hardware)
+- Video only (no audio routing through virtual camera)
+- Must maintain same performance as export rendering
+
+**Privacy & Trust:**
+- Requires camera access permission (standard macOS security)
+- Clear UI indicator when virtual camera is active and in use
+- User sees which app is accessing the camera
+- Can be disabled at any time
+- No data leaves device without explicit user action
+
+**Usage Modes:**
+1. **Artifact mode:** Record → Replay → Export MP4
+2. **Live mode:** Microphone → Orb → Virtual Camera (real-time)
+
+Both modes use identical orb engine. Virtual camera is real-time rendering of what would be exported.
+
+**UX Notes:**
+- Toggle virtual camera on/off in main UI
+- Status indicator when camera is active
+- Performance warning if system struggles with real-time rendering
+
+⸻
+
+## 15. RELEASE PHILOSOPHY
 
 Ship small.
 Ship calm.
@@ -237,6 +276,8 @@ AURA does not visualize sound.
 
 AURA gives voice a body.
 
+**AURA supports both durable artifacts and live presence.**
+
 ⸻
 
-**Status:** PRD locked
+**Status:** PRD locked (macOS-only focus)
