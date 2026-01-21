@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 import Metal
 import Combine
+import CoreVideo
 
 /// Connects audio engine → physics → renderer
 /// Handles state transitions
@@ -54,11 +55,30 @@ final class AuraCoordinator: ObservableObject {
     }
     
     private func setupPhysicsTimer() {
-        // Run physics at 60Hz
-        physicsTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
-            self?.updatePhysics()
+        // Use CVDisplayLink for precise 60Hz timing synchronized with display
+        var displayLink: CVDisplayLink?
+        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+        
+        if let displayLink = displayLink {
+            self.displayLink = displayLink
+            
+            CVDisplayLinkSetOutputCallback(displayLink, { (_, _, _, _, _, userInfo) -> CVReturn in
+                guard let userInfo = userInfo else { return kCVReturnSuccess }
+                let coordinator = Unmanaged<AuraCoordinator>.fromOpaque(userInfo).takeUnretainedValue()
+                DispatchQueue.main.async {
+                    coordinator.updatePhysics()
+                }
+                return kCVReturnSuccess
+            }, Unmanaged.passUnretained(self).toOpaque())
+            
+            CVDisplayLinkStart(displayLink)
+        } else {
+            // Fallback to Timer if CVDisplayLink is unavailable
+            physicsTimer = Timer.scheduledTimer(withTimeInterval: 1.0 / 60.0, repeats: true) { [weak self] _ in
+                self?.updatePhysics()
+            }
+            physicsTimer?.tolerance = 0.001
         }
-        physicsTimer?.tolerance = 0.001
     }
     
     private func updatePhysics() {
@@ -208,6 +228,12 @@ final class AuraCoordinator: ObservableObject {
     // MARK: - Cleanup
     
     func cleanup() {
+        // Stop CVDisplayLink if active
+        if let displayLink = displayLink {
+            CVDisplayLinkStop(displayLink)
+            self.displayLink = nil
+        }
+        
         physicsTimer?.invalidate()
         physicsTimer = nil
         

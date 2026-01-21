@@ -1,5 +1,6 @@
 import Foundation
 import AVFoundation
+import Accelerate
 
 /// Deterministic WAV file writer
 /// Receives PCM buffers from AudioCaptureEngine
@@ -49,17 +50,24 @@ final class WavRecorder {
             guard let floatData = buffer.floatChannelData?[0] else { return }
             
             let frameCount = Int(buffer.frameLength)
-            let samples = UnsafeBufferPointer(start: floatData, count: frameCount)
             
-            // Convert Float32 to Int16
-            var int16Samples = [Int16]()
-            int16Samples.reserveCapacity(frameCount)
+            // Use vDSP for vectorized Float32 to Int16 conversion
+            var int16Samples = [Int16](repeating: 0, count: frameCount)
             
-            for sample in samples {
-                let clampedSample = max(-1.0, min(1.0, sample))
-                let int16Sample = Int16(clampedSample * Float(Int16.max))
-                int16Samples.append(int16Sample)
-            }
+            // Scale factor: Float32 [-1, 1] to Int16 range
+            var scale = Float(Int16.max)
+            var scaledSamples = [Float](repeating: 0, count: frameCount)
+            
+            // Multiply by scale factor
+            vDSP_vsmul(floatData, 1, &scale, &scaledSamples, 1, vDSP_Length(frameCount))
+            
+            // Clip to valid range and convert to Int16
+            var minVal: Float = Float(Int16.min)
+            var maxVal: Float = Float(Int16.max)
+            vDSP_vclip(scaledSamples, 1, &minVal, &maxVal, &scaledSamples, 1, vDSP_Length(frameCount))
+            
+            // Convert to Int16
+            vDSP_vfix16(scaledSamples, 1, &int16Samples, 1, vDSP_Length(frameCount))
             
             // Write to file
             let data = Data(bytes: int16Samples, count: frameCount * 2)

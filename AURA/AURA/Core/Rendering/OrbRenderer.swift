@@ -267,12 +267,12 @@ private func lookAt(eye: SIMD3<Float>, center: SIMD3<Float>, up: SIMD3<Float>) -
 private func orthographic(left: Float, right: Float, bottom: Float, top: Float, near: Float, far: Float) -> float4x4 {
     let tx = -(right + left) / (right - left)
     let ty = -(top + bottom) / (top - bottom)
-    let tz = -near / (far - near)
+    let tz = -(far + near) / (far - near)
     
     return float4x4(columns: (
         SIMD4<Float>(2 / (right - left), 0, 0, 0),
         SIMD4<Float>(0, 2 / (top - bottom), 0, 0),
-        SIMD4<Float>(0, 0, 1 / (far - near), 0),
+        SIMD4<Float>(0, 0, -2 / (far - near), 0),
         SIMD4<Float>(tx, ty, tz, 1)
     ))
 }

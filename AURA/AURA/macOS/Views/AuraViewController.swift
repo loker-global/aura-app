@@ -14,6 +14,7 @@ final class AuraViewController: NSViewController {
     
     private var metalView: MTKView!
     private var cancellables = Set<AnyCancellable>()
+    private var eventMonitor: Any?
     
     // UI Elements
     private var recordingIndicator: NSView!
@@ -126,8 +127,14 @@ final class AuraViewController: NSViewController {
     
     private func setupKeyboardHandling() {
         // Enable key events
-        NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
+        eventMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { [weak self] event in
             return self?.handleKeyDown(event) ?? event
+        }
+    }
+    
+    deinit {
+        if let monitor = eventMonitor {
+            NSEvent.removeMonitor(monitor)
         }
     }
     
