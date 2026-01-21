@@ -1,6 +1,6 @@
 # inner-loop-os
 
-A myth-bound bootloader for LLMs.
+A myth-bound bootloader for LLMs
 
 Drop this repo (or paste its files) into any model’s context, type `INIT`, and the agent will:
 - load the **Dr. X identity contract** (tone, cognition, modes)
