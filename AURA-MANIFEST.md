@@ -175,10 +175,11 @@ AURA/
 
 1. Audio + Physics (no rendering)
 2. Metal + Integration
-3. Platform Views (iOS/macOS)
+3. Platform Views (macOS)
 4. Coordination + State
 5. Export Pipeline
-6. Polish + Error States
+6. Virtual Camera Output
+7. Polish + Error States
 
 ---
 
@@ -186,11 +187,14 @@ AURA/
 
 Complete specification in `./work/`:
 - 19 documents
-- ~25,000 words
+- ~30,000 words
 - Zero ambiguity
 - Implementation-level detail
 
-Read `HANDOFF-PACKAGE.md` first.
+**Start here:**
+1. Read `INSTRUCTIONS.md` for Xcode project setup
+2. Read `HANDOFF-PACKAGE.md` for documentation index
+3. Follow implementation phases 1-7
 
 ---
 
@@ -221,15 +225,50 @@ If it violates "tools over hype, precision, voice as memory," it is wrong.
 
 ---
 
+## VIRTUAL CAMERA OUTPUT
+
+### Core Feature: Live Presence Surface
+
+AURA includes a virtual camera that makes the orb available to other applications (Zoom, FaceTime, OBS, etc.).
+
+**What It Provides:**
+- Real-time orb output as a system camera device
+- Same motion contract as exports (same physics, same rendering)
+- Same calm, same damping, same deformation limits
+- No audio routing (video only)
+
+**Technical Implementation:**
+- Uses CoreMediaIO APIs on macOS
+- No driver or system extension installation required
+- Appears as standard camera in system preferences
+- 1080p or 720p output at 60fps (or 30fps fallback)
+
+**Privacy & Trust:**
+- Requires camera access permission (standard macOS flow)
+- Clear UI indicator when virtual camera is active
+- User controls which apps can access the camera
+- Can be disabled at any time
+- No data leaves device without explicit user action
+
+**Usage Modes:**
+1. **Artifact mode:** Voice → Presence → Export (MP4)
+2. **Live mode:** Voice → Presence → Virtual Camera (real-time)
+
+Both modes use the same orb engine. The virtual camera streams what would otherwise be exported.
+
+---
+
 ## FINAL STATEMENT
 
 AURA does not visualize sound.
 
 AURA gives voice a body.
 
+**AURA supports both durable artifacts and live presence.**
+
 ---
 
 **Version:** 1.0
-**Status:** Production specification complete
+**Status:** Production specification complete (macOS-only focus)
 **Date:** January 21, 2026
 **Built with:** Dr. X protocol (inner-loop-os)

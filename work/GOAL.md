@@ -32,13 +32,16 @@ AURA gives voice a body that can be recorded, replayed, and shared.
 
 ## Done State
 
-Universal app (macOS + iOS) that:
+macOS app that:
 - Records voice to WAV (canonical)
 - Renders live orb presence in real time
 - Replays recordings as orb re-embodiment
 - Exports audio (WAV/MP3) and video (MP4 with orb)
+- Provides virtual camera output for real-time orb streaming to other apps
 - Feels complete, trustworthy, calm
 
 ---
 
 **AURA does not visualize sound. AURA gives voice a body.**
+
+**AURA supports both durable artifacts and live presence.**

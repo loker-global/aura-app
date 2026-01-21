@@ -5,8 +5,30 @@
 ## 0. HANDOFF STATUS
 
 **Date:** January 21, 2026
-**Status:** PRODUCTION READY (100% specification complete)
-**Readiness:** Zero ambiguity, mechanical execution possible
+**Status:** PRODUCTION READY (100% specification complete, macOS-only focus)
+**Readiness:** Zero ambiguity, mechanica## 11. PHILOSOPHY CHECK
+
+### Core Principles (Must Propagate to Code)
+- **Tools over hype** — No flashy features, no marketing gimmicks
+- **Precision** — Every constant specified, no guessing
+- **Voice as memory** — Recordings are presence, not content
+- **Calm > Expressive** — UI recedes, orb primary
+- **Local-first** — Privacy absolute, no network
+- **Reversibility** — All actions undoable or recoverable
+- **Artifact-first** — Record → Replay → Export is the core workflow
+
+### Anti-Patterns (Must Be Rejected)
+- Audio reactive (too fast, feels like visualizer)
+- Impressive motion (draws attention to itself)
+- Complex UI (cognitive load)
+- Hidden behavior (no magic)
+- Data extraction (telemetry, analytics)
+- Reframing as streaming/calling tool (not AURA's purpose)
+
+---
+
+## 12. HANDOFF CHECKLIST
+**Platform:** macOS 12+ (iOS deferred to Phase 2)
 
 ---
 
@@ -19,12 +41,13 @@
 4. **PREREQUISITES.md** — Core capabilities, orb contract, audio philosophy
 
 ### Decisions & Architecture
-5. **DECISION-UI-FRAMEWORK.md** — UIKit/AppKit chosen (justified via DECISION.md protocol)
-6. **ARCHITECTURE.md** — 5-layer module structure, thread model, state machine
+5. **DECISION-UI-FRAMEWORK.md** — AppKit chosen (justified via DECISION.md protocol)
+6. **DECISION-MACOS-FOCUS.md** — Platform scope and virtual camera positioning
+7. **ARCHITECTURE.md** — 5-layer module structure, thread model, state machine
 
 ---
 
-## 2. IMPLEMENTATION SPECIFICATIONS (10)
+## 3. IMPLEMENTATION SPECIFICATIONS (10)
 
 ### Critical (Block Development)
 7. **AUDIO-MAPPING.md** — Audio features → physics forces (RMS, centroid, ZCR, onset)
@@ -46,17 +69,18 @@
 
 ---
 
-## 3. META DOCUMENTS (2)
+## 4. META DOCUMENTS (3)
 
-17. **DECISION-HANDOFF-COMPLETENESS.md** — Option C chosen (complete all specs)
-18. **HANDOFF-AUDIT.md** — Gap analysis, recommendations, readiness assessment
+17. **INSTRUCTIONS.md** — Xcode project setup, implementation guide, testing checklist
+18. **DECISION-HANDOFF-COMPLETENESS.md** — Option C chosen (complete all specs)
+19. **HANDOFF-AUDIT.md** — Gap analysis, recommendations, readiness assessment
 
 ---
 
-## 4. DOCUMENT STATISTICS
+## 5. DOCUMENT STATISTICS
 
-**Total Documents:** 18
-**Total Word Count:** ~25,000 words
+**Total Documents:** 19
+**Total Word Count:** ~30,000 words
 **Specification Depth:** Implementation-level (no guessing required)
 
 **Coverage:**
@@ -71,15 +95,24 @@
 - ✓ Error Handling
 - ✓ Testing Strategy
 - ✓ Edge Cases
+- ✓ Virtual Camera Output
 
 ---
 
-## 5. KEY DECISIONS LOCKED
+## 6. KEY DECISIONS LOCKED
 
 ### Framework
-**UIKit/AppKit** (not SwiftUI)
+**AppKit** (macOS-only for v1, no SwiftUI)
 - Reason: Keyboard reliability, Metal control, reversibility
-- Platform targets: iOS 15+ / macOS 12+
+- Platform target: macOS 12.0+
+- Note: iOS deferred to future phase
+
+### Virtual Camera
+**Core MVP feature** (Phase 6)
+- Uses CoreMediaIO APIs (no driver installation)
+- Same orb engine as exports (real-time version)
+- 1080p/720p at 60fps (30fps fallback)
+- Must not impact audio/recording performance
 
 ### Audio
 **48 kHz, 16-bit, mono WAV** (canonical)
@@ -123,8 +156,9 @@
 - Physics → Rendering integration
 
 ### Phase 3: Platform Views
-- iOS: UIViewController + keyboard commands
 - macOS: NSViewController + menu bar integration
+- Keyboard shortcuts implementation
+- Device picker UI
 
 ### Phase 4: Coordination + State
 - StateManager (enum-based state machine)
@@ -134,7 +168,12 @@
 - OrbExporter (offline rendering + AVAssetWriter)
 - MP4 mux (video + audio)
 
-### Phase 6: Polish
+### Phase 6: Virtual Camera
+- VirtualCameraOutput (CoreMediaIO integration)
+- Real-time frame streaming
+- System camera registration
+
+### Phase 7: Polish
 - Error states (see ERROR-MESSAGES.md)
 - Device switching (see DEVICE-SWITCHING-UX.md)
 - Keyboard shortcuts (see KEYBOARD-SHORTCUTS.md)
@@ -167,6 +206,8 @@
 - [ ] Silence feels calm (not frozen, not jittery)
 - [ ] Keyboard shortcuts 100% reliable (macOS)
 - [ ] Export video plays on iPhone (AirDrop test)
+- [ ] Virtual camera works in Zoom/FaceTime/OBS
+- [ ] Recording continues while virtual camera is active
 
 ---
 
@@ -178,11 +219,54 @@ AURA succeeds if:
 - Muted video still feels complete
 - Exports feel meaningful, not gimmicky
 - Users trust AURA with private voice moments
-- Works on macOS and iOS (universal)
+- Works on macOS (v1 focus)
 
 ---
 
-## 10. PHILOSOPHY CHECK
+## 10. VIRTUAL CAMERA OUTPUT (MVP FEATURE)
+
+### Live Presence Surface
+
+AURA includes virtual camera output as a core feature for v1.
+
+**What It Provides:**
+- Real-time orb streaming as system camera device
+- Available in Zoom, FaceTime, OBS, Discord, etc.
+- Same orb engine, same motion contract as exports
+- Same physics, rendering, and deformation limits
+
+**Technical Implementation:**
+- Uses CoreMediaIO APIs (macOS 12.3+)
+- No driver or system extension installation
+- Appears as "AURA Orb" in camera selection
+- 1080p/720p at 60fps (30fps fallback)
+
+**Implementation Priority:**
+- Phase 5 (after export pipeline)
+- Reuses OrbRenderer output
+- Dedicated VirtualCameraOutput module
+- Must not impact audio/rendering performance
+
+**Documentation:**
+- See ARCHITECTURE.md Section 14 for module design
+- See EXPORT-SPEC.md Section 12 for technical specs
+- See DESIGN.md Section 11 for UI constraints
+
+**Privacy & Trust:**
+- Requires camera permission (standard macOS flow)
+- Clear indicator when camera is in use
+- User can enable/disable at any time
+- Video only (no audio routing)
+
+**Conceptual Modes:**
+- Artifact mode: Record → Replay → Export MP4
+- Live mode: Microphone → Orb → Virtual Camera
+
+Both modes use identical rendering pipeline.
+
+---
+
+## 11. PHILOSOPHY CHECK
 
 ### Core Principles (Must Propagate to Code)
 - **Tools over hype** — No flashy features, no marketing gimmicks
@@ -228,7 +312,7 @@ AURA succeeds if:
 
 ---
 
-## 12. CONTACT / QUESTIONS
+## 13. CONTACT / QUESTIONS
 
 ### If Ambiguity Found
 1. Check relevant spec first (likely documented)
@@ -244,7 +328,7 @@ AURA succeeds if:
 
 ## FINAL STATEMENT
 
-This handoff package represents complete planning for AURA v1.
+This handoff package represents complete planning for AURA v1 (macOS).
 
 No guessing required.
 No design decisions deferred.
@@ -257,8 +341,10 @@ If spec is wrong, update spec first, then code.
 
 **Specs are truth. Code follows.**
 
+**AURA supports both durable artifacts and live presence.**
+
 ⸻
 
-**Status:** Production handoff complete
+**Status:** Production handoff complete (macOS-only focus)
 **Date:** January 21, 2026
 **Approved by:** Dr. X
